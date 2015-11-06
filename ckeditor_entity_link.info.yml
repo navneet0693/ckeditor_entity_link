@@ -1,0 +1,7 @@
+name: CKEditor Entity Link
+type: module
+description: Allows to insert links to entities in CKEditor.
+core: 8.x
+package: User interface
+dependencies:
+  - ckeditor
