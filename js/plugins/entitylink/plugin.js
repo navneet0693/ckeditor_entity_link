@@ -118,7 +118,7 @@
           };
 
           // Open the dialog for the edit form.
-          Drupal.ckeditor.openDialog(editor, Drupal.url('editor/dialog/link/' + editor.config.drupal.format), existingValues, saveCallback, dialogSettings);
+          Drupal.ckeditor.openDialog(editor, Drupal.url('ckeditor-entity-link/dialog/' + editor.config.drupal.format), existingValues, saveCallback, dialogSettings);
         }
       });
 
