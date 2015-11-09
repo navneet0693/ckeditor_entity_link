@@ -5,3 +5,11 @@ ckeditor_entity_link.dialog:
     _title: 'Add Entity link'
   requirements:
     _entity_access: 'filter_format.use'
+
+ckeditor_entity_link.ckeditor_entity_link_config_form:
+  path: '/admin/config/ckeditor_entity_link/settings'
+  defaults:
+    _form: '\Drupal\ckeditor_entity_link\Form\CKEditorEntityLinkConfigForm'
+    _title: 'CKEditor Entity Link settings'
+  requirements:
+    _permission: 'access administration pages'
