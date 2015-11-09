@@ -8,6 +8,7 @@
 namespace Drupal\ckeditor_entity_link\Form;
 
 use Drupal\Core\Ajax\ReplaceCommand;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\filter\Entity\FilterFormat;
@@ -134,7 +135,7 @@ class CKEditorEntityLinkDialog extends FormBase {
 
       $values = array(
         'attributes' => array(
-          'href' => $entity->url(),
+          'href' => $this->getUrl($entity),
           'target' => $form_state->getValue('target')
         )
       );
@@ -146,6 +147,24 @@ class CKEditorEntityLinkDialog extends FormBase {
     return $response;
   }
 
+  /**
+   * Helper function to return entity url.
+   *
+   * @param EntityInterface $entity
+   *
+   * @return string
+   *   Entity url.
+   */
+  public static function getUrl(EntityInterface $entity) {
+    switch ($entity->getEntityType()->get('id')) {
+      case 'menu_link_content':
+        return $entity->getUrlObject()->toString();
+      case 'shortcut':
+        return $entity->getUrl()->toString();
+      default:
+        return $entity->url();
+    }
+  }
 
   /**
    * Ajax callback to update the form fields which depend on embed type.
