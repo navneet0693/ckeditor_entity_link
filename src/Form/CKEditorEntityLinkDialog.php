@@ -155,7 +155,7 @@ class CKEditorEntityLinkDialog extends FormBase {
    * @return string
    *   Entity url.
    */
-  public static function getUrl(EntityInterface $entity) {
+  public function getUrl(EntityInterface $entity) {
     switch ($entity->getEntityType()->get('id')) {
       case 'menu_link_content':
         return $entity->getUrlObject()->toString();
