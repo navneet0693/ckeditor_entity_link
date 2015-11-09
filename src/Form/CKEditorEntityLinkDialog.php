@@ -35,6 +35,8 @@ class CKEditorEntityLinkDialog extends FormBase {
    *   The filter format for which this dialog corresponds.
    */
   public function buildForm(array $form, FormStateInterface $form_state, FilterFormat $filter_format = NULL) {
+    $config = $this->config('ckeditor_entity_link.settings');
+
     // The default values are set directly from \Drupal::request()->request,
     // provided by the editor plugin opening the dialog.
     $user_input = $form_state->getUserInput();
@@ -45,11 +47,18 @@ class CKEditorEntityLinkDialog extends FormBase {
     $form['#prefix'] = '<div id="ckeditor-entity-link-dialog-form">';
     $form['#suffix'] = '</div>';
 
-    $types = \Drupal::entityManager()->getEntityTypeLabels(TRUE);
+    $typeLabels = \Drupal::entityManager()->getEntityTypeLabels(TRUE);
+    $types = array();
+    foreach ($config->get('entity_types') as $type => $selected) {
+      if ($selected) {
+        $types[$type] = $typeLabels['Content'][$type];
+      }
+    }
+
     $form['entity_type'] = array(
       '#type' => 'select',
       '#title' => t('Entity type'),
-      '#options' => $types['Content'],
+      '#options' => $types,
       '#default_value' => 'node',
       '#required' => TRUE,
       '#size' => 1,
@@ -59,15 +68,26 @@ class CKEditorEntityLinkDialog extends FormBase {
       ),
     );
 
-    $entity_type = $form_state->getValue('entity_type');
+    $entity_type = empty($form_state->getValue('entity_type')) ? 'node' : $form_state->getValue('entity_type');
+    $bundles = array();
+    foreach ($config->get($entity_type . '_bundles') as $bundle => $selected) {
+      if ($selected) {
+        $bundles[] = $bundle;
+      }
+    }
+
     $form['entity_id'] = array(
       '#type' => 'entity_autocomplete',
-      '#target_type' => empty($entity_type) ? 'node' : $entity_type,
+      '#target_type' => $entity_type,
       '#title' => t('Entity'),
       '#required' => TRUE,
       '#prefix' => '<div id="entity-id-wrapper">',
       '#suffix' => '</div>',
     );
+
+    if (!empty($bundles)) {
+      $form['entity_id']['#selection_settings']['target_bundles'] = $bundles;
+    }
 
     $form['target'] = array(
       '#title' => $this->t('Open in new window'),
