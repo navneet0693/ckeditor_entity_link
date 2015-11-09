@@ -6,8 +6,8 @@ ckeditor_entity_link.dialog:
   requirements:
     _entity_access: 'filter_format.use'
 
-ckeditor_entity_link.ckeditor_entity_link_config_form:
-  path: '/admin/config/ckeditor_entity_link/settings'
+ckeditor_entity_link.config_form:
+  path: '/admin/config/content/ckeditor_entity_link'
   defaults:
     _form: '\Drupal\ckeditor_entity_link\Form\CKEditorEntityLinkConfigForm'
     _title: 'CKEditor Entity Link settings'
