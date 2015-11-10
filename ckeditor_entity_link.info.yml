@@ -3,5 +3,7 @@ type: module
 description: Allows to insert entity links in CKEditor.
 core: 8.x
 package: User interface
+configure: ckeditor_entity_link.config_form
 dependencies:
   - ckeditor
+  - editor
