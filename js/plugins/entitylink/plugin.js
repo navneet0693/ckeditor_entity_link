@@ -1,6 +1,6 @@
 /**
  * @file
- * Entity Link plugin.
+ * CKEditor Entity Link plugin. Based on core link plugin.
  *
  * @ignore
  */
@@ -121,9 +121,6 @@
           Drupal.ckeditor.openDialog(editor, Drupal.url('ckeditor-entity-link/dialog/' + editor.config.drupal.format), existingValues, saveCallback, dialogSettings);
         }
       });
-
-      // CTRL + K.
-      // editor.setKeystroke(CKEDITOR.CTRL + 75, 'entitylink');
 
       // Add buttons for link and unlink.
       if (editor.ui.addButton) {
