@@ -16,7 +16,7 @@ function ckeditor_entity_link_help($route_name, RouteMatchInterface $route_match
     case 'help.page.ckeditor_entity_link':
       $output = '';
       $output .= '<h3>' . t('About') . '</h3>';
-      $output .= '<p>' . t('Allows to insert links to entities in CKEditor.') . '</p>';
+      $output .= '<p>' . t('Allows to insert entity links in CKEditor.') . '</p>';
       return $output;
 
     default:
