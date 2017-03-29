@@ -48,11 +48,11 @@ class CKEditorEntityLinkDialog extends FormBase {
     $form['#prefix'] = '<div id="ckeditor-entity-link-dialog-form">';
     $form['#suffix'] = '</div>';
 
-    $typeLabels = \Drupal::entityManager()->getEntityTypeLabels(TRUE);
+    $entity_types = \Drupal::entityTypeManager()->getDefinitions();
     $types = array();
     foreach ($config->get('entity_types') as $type => $selected) {
       if ($selected) {
-        $types[$type] = $typeLabels['Content'][$type];
+        $types[$type] = $entity_types[$type]->getLabel();
       }
     }
 

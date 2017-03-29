@@ -42,11 +42,20 @@ class CKEditorEntityLinkConfigForm extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->config('ckeditor_entity_link.settings');
 
-    $types = \Drupal::entityManager()->getEntityTypeLabels(TRUE);
+    $entity_types = \Drupal::entityTypeManager()->getDefinitions();
+    $options = [];
+    foreach ($entity_types as $entity_type) {
+      if ($entity_type->getGroup() == 'content') {
+        $options[$entity_type->id()] = $entity_type->getLabel();
+      }
+    }
+    if (!$options) {
+      return ['#markup' => 'No entity types'];
+    }
     $form['entity_types'] = array(
       '#type' => 'checkboxes',
       '#title' => t('Entity types'),
-      '#options' => $types['Content'],
+      '#options' => $options,
       '#default_value' => $config->get('entity_types'),
       '#required' => TRUE,
       '#ajax' => array(
@@ -71,7 +80,7 @@ class CKEditorEntityLinkConfigForm extends ConfigFormBase {
         }
         $form['bundles'][$type] = array(
           '#type' => 'fieldset',
-          '#title' => t($types['Content'][$type] . ' bundles'),
+          '#title' => t($options[$type] . ' bundles'),
         );
         $form['bundles'][$type][$type . '_bundles'] = array(
           '#type' => 'checkboxes',
