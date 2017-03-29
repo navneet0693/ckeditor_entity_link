@@ -17,8 +17,7 @@
           element: 'a',
           styles: {},
           attributes: {
-            '!href': '',
-            'target': ''
+            '!href': ''
           }
         }),
         requiredContent: new CKEDITOR.style({
@@ -72,11 +71,6 @@
                 var text = new CKEDITOR.dom.text(returnValues.attributes.href.replace(/^mailto:/, ''), editor.document);
                 range.insertNode(text);
                 range.selectNodeContents(text);
-              }
-
-              // Ignore a disabled target attribute.
-              if (returnValues.attributes.target === 0) {
-                delete returnValues.attributes.target;
               }
 
               // Create the new link by applying a style to the new text.

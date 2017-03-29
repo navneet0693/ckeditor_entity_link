@@ -9,6 +9,7 @@ namespace Drupal\ckeditor_entity_link\Form;
 
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\BaseFormIdInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\filter\Entity\FilterFormat;
@@ -20,13 +21,21 @@ use Drupal\Core\Ajax\CloseModalDialogCommand;
 /**
  * Provides a link dialog for text editors.
  */
-class CKEditorEntityLinkDialog extends FormBase {
+class CKEditorEntityLinkDialog extends FormBase implements BaseFormIdInterface {
 
   /**
    * {@inheritdoc}
    */
   public function getFormId() {
     return 'ckeditor_entity_link_dialog';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getBaseFormId() {
+    // Use the EditorLinkDialog form id to ease alteration.
+    return 'editor_link_dialog';
   }
 
   /**
@@ -90,13 +99,6 @@ class CKEditorEntityLinkDialog extends FormBase {
       $form['entity_id']['#selection_settings']['target_bundles'] = $bundles;
     }
 
-    $form['target'] = array(
-      '#title' => $this->t('Open in new window'),
-      '#type' => 'checkbox',
-      '#default_value' => !empty($input['target']),
-      '#return_value' => '_blank',
-    );
-
     $form['actions'] = array(
       '#type' => 'actions',
     );
@@ -136,8 +138,7 @@ class CKEditorEntityLinkDialog extends FormBase {
       $values = array(
         'attributes' => array(
           'href' => $this->getUrl($entity),
-          'target' => $form_state->getValue('target')
-        )
+        ) + $form_state->getValue('attributes', [])
       );
 
       $response->addCommand(new EditorDialogSave($values));
