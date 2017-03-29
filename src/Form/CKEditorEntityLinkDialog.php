@@ -123,7 +123,7 @@ class CKEditorEntityLinkDialog extends FormBase implements BaseFormIdInterface {
         '#type' => 'status_messages',
         '#weight' => -10,
       ];
-      $response->addCommand(new HtmlCommand('#editor-link-dialog-form', $form));
+      $response->addCommand(new HtmlCommand('#ckeditor-entity-link-dialog-form', $form));
     }
     else {
       $entity = \Drupal::entityManager()
