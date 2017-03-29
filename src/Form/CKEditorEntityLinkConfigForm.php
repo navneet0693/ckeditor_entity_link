@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains Drupal\ckeditor_entity_link\Form\CKEditorEntityLinkConfigForm.
- */
-
 namespace Drupal\ckeditor_entity_link\Form;
 
 use Drupal\Core\Form\ConfigFormBase;

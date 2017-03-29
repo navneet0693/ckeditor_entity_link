@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\ckeditor\Plugin\CKEditorPlugin\DrupalLink.
- */
-
 namespace Drupal\ckeditor_entity_link\Plugin\CKEditorPlugin;
 
 use Drupal\ckeditor\CKEditorPluginBase;

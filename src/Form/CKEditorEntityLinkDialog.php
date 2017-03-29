@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\ckeditor_entity_link\Form\CKEditorEntityLinkDialog.
- */
-
 namespace Drupal\ckeditor_entity_link\Form;
 
 use Drupal\Core\Ajax\ReplaceCommand;
