@@ -62,7 +62,7 @@ class CKEditorEntityLinkDialog extends FormBase implements BaseFormIdInterface {
 
     $form['entity_type'] = array(
       '#type' => 'select',
-      '#title' => t('Entity type'),
+      '#title' => t('Link type'),
       '#options' => $types,
       '#default_value' => 'node',
       '#required' => TRUE,
@@ -84,7 +84,7 @@ class CKEditorEntityLinkDialog extends FormBase implements BaseFormIdInterface {
     $form['entity_id'] = array(
       '#type' => 'entity_autocomplete',
       '#target_type' => $entity_type,
-      '#title' => t('Entity'),
+      '#title' => t('Link'),
       '#required' => TRUE,
       '#prefix' => '<div id="entity-id-wrapper">',
       '#suffix' => '</div>',
