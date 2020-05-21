@@ -49,7 +49,7 @@ class CKEditorEntityLinkConfigForm extends ConfigFormBase {
     }
     $form['entity_types'] = array(
       '#type' => 'checkboxes',
-      '#title' => t('Entity types'),
+      '#title' => $this->t('Entity types'),
       '#options' => $options,
       '#default_value' => $config->get('entity_types'),
       '#required' => TRUE,
@@ -75,13 +75,13 @@ class CKEditorEntityLinkConfigForm extends ConfigFormBase {
         }
         $form['bundles'][$type] = array(
           '#type' => 'fieldset',
-          '#title' => t($options[$type] . ' bundles'),
+          '#title' => $this->t($options[$type] . ' bundles'),
         );
         $form['bundles'][$type][$type . '_bundles'] = array(
           '#type' => 'checkboxes',
           '#options' => $bundles,
           '#default_value' => $config->get($type . '_bundles'),
-          '#description' => t('Select bundles to be available as autocomplete suggestions. If no selected, all will be available.')
+          '#description' => $this->t('Select bundles to be available as autocomplete suggestions. If no selected, all will be available.')
         );
       }
     }
