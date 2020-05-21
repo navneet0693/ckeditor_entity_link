@@ -36,8 +36,8 @@ class EntityLink extends CKEditorPluginBase {
    */
   public function getConfig(Editor $editor) {
     return array(
-      'EntityLink_dialogTitleAdd' => t('Add Link'),
-      'EntityLink_dialogTitleEdit' => t('Edit Link'),
+      'EntityLink_dialogTitleAdd' => $this->t('Add Link'),
+      'EntityLink_dialogTitleEdit' => $this->t('Edit Link'),
     );
   }
 
@@ -48,7 +48,7 @@ class EntityLink extends CKEditorPluginBase {
     $path = drupal_get_path('module', 'ckeditor_entity_link') . '/js/plugins/entitylink';
     return array(
       'EntityLink' => array(
-        'label' => t('Link'),
+        'label' => $this->t('Link'),
         'image' => $path . '/link.png',
       ),
     );
