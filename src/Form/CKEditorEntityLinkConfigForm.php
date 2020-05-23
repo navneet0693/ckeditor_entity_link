@@ -11,7 +11,6 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-
 /**
  * Class CKEditorEntityLinkConfigForm.
  *
@@ -19,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class CKEditorEntityLinkConfigForm extends ConfigFormBase {
 
-    /**
+  /**
    * Entity type manager service.
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
@@ -31,8 +30,7 @@ class CKEditorEntityLinkConfigForm extends ConfigFormBase {
    *
    * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
    */
-    protected $bundleInfo;
-
+  protected $bundleInfo;
 
   /**
    * Class constructor.
@@ -41,8 +39,8 @@ class CKEditorEntityLinkConfigForm extends ConfigFormBase {
    *   The factory for configuration objects.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   Entity type manager service.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
-   *   The entity type bundle info.
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundle_info
+   *   The entity bundle information service.
    */
   public function __construct(ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $bundle_info) {
     parent::__construct($config_factory);
@@ -66,7 +64,7 @@ class CKEditorEntityLinkConfigForm extends ConfigFormBase {
    */
   protected function getEditableConfigNames() {
     return [
-      'ckeditor_entity_link.settings'
+      'ckeditor_entity_link.settings',
     ];
   }
 
@@ -92,53 +90,46 @@ class CKEditorEntityLinkConfigForm extends ConfigFormBase {
     if (!$options) {
       return ['#markup' => 'No entity types'];
     }
-    $form['entity_types'] = array(
+    $form['entity_types'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t('Entity types'),
       '#options' => $options,
       '#default_value' => $config->get('entity_types'),
       '#required' => TRUE,
-      '#ajax' => array(
+      '#ajax' => [
         'callback' => '::updateTypeSettings',
         'effect' => 'fade',
-      ),
-    );
+      ],
+    ];
 
-    $form['bundles'] = array(
+    $form['bundles'] = [
       '#type' => 'container',
       '#prefix' => '<div id="bundles-wrapper">',
       '#suffix' => '</div>',
-    );
+    ];
 
     $selected_types = empty($form_state->getValue('entity_types')) ? $config->get('entity_types') : $form_state->getValue('entity_types');
     foreach ($selected_types as $type) {
       if (!empty($type)) {
         $bundle_info = $this->bundleInfo->getBundleInfo($type);
-        $bundles = array();
+        $bundles = [];
         foreach ($bundle_info as $bundle => $info) {
           $bundles[$bundle] = $info['label'];
         }
-        $form['bundles'][$type] = array(
+        $form['bundles'][$type] = [
           '#type' => 'fieldset',
-          '#title' => $this->t($options[$type] . ' bundles'),
-        );
-        $form['bundles'][$type][$type . '_bundles'] = array(
+          '#title' => $this->t('@bundles', ['@bundles' => $options[$type] . ' bundles']),
+        ];
+        $form['bundles'][$type][$type . '_bundles'] = [
           '#type' => 'checkboxes',
           '#options' => $bundles,
           '#default_value' => $config->get($type . '_bundles'),
-          '#description' => $this->t('Select bundles to be available as autocomplete suggestions. If no selected, all will be available.')
-        );
+          '#description' => $this->t('Select bundles to be available as autocomplete suggestions. If no selected, all will be available.'),
+        ];
       }
     }
 
     return parent::buildForm($form, $form_state);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
-    parent::validateForm($form, $form_state);
   }
 
   /**
@@ -167,7 +158,7 @@ class CKEditorEntityLinkConfigForm extends ConfigFormBase {
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state.
    *
-   * @return AjaxResponse
+   * @return \Drupal\Core\Ajax\AjaxResponse
    *   Ajax response with updated options for the embed type.
    */
   public function updateTypeSettings(array &$form, FormStateInterface $form_state) {
@@ -181,4 +172,5 @@ class CKEditorEntityLinkConfigForm extends ConfigFormBase {
 
     return $response;
   }
+
 }
