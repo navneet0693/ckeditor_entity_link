@@ -12,12 +12,40 @@ use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\HtmlCommand;
 use Drupal\editor\Ajax\EditorDialogSave;
 use Drupal\Core\Ajax\CloseModalDialogCommand;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a link dialog for text editors.
  */
 class CKEditorEntityLinkDialog extends FormBase implements BaseFormIdInterface {
 
+  /**
+   * Entity type manager service.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+
+  /**
+   * Class constructor.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   Entity type manager service.
+   */
+  public function __construct(EntityTypeManagerInterface $entity_type_manager) {
+    $this->entityTypeManager = $entity_type_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('entity_type.manager')
+    );
+  }
   /**
    * {@inheritdoc}
    */
@@ -44,15 +72,12 @@ class CKEditorEntityLinkDialog extends FormBase implements BaseFormIdInterface {
 
     // The default values are set directly from \Drupal::request()->request,
     // provided by the editor plugin opening the dialog.
-    $user_input = $form_state->getUserInput();
-    $input = isset($user_input['editor_object']) ? $user_input['editor_object'] : array();
-
     $form['#tree'] = TRUE;
     $form['#attached']['library'][] = 'editor/drupal.editor.dialog';
     $form['#prefix'] = '<div id="ckeditor-entity-link-dialog-form">';
     $form['#suffix'] = '</div>';
 
-    $entity_types = \Drupal::entityTypeManager()->getDefinitions();
+    $entity_types = $this->entityTypeManager->getDefinitions();
     $types = array();
     foreach ($config->get('entity_types') as $type => $selected) {
       if ($selected) {
@@ -126,7 +151,7 @@ class CKEditorEntityLinkDialog extends FormBase implements BaseFormIdInterface {
       $response->addCommand(new HtmlCommand('#ckeditor-entity-link-dialog-form', $form));
     }
     else {
-      $entity = \Drupal::entityManager()
+      $entity = $this->entityTypeManager
         ->getStorage( $form_state->getValue('entity_type'))
         ->load( $form_state->getValue('entity_id'));
 

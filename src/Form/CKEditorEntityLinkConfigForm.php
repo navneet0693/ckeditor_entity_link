@@ -6,6 +6,10 @@ use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\ReplaceCommand;
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 
 /**
@@ -14,6 +18,48 @@ use Drupal\Core\Ajax\ReplaceCommand;
  * @package Drupal\ckeditor_entity_link\Form
  */
 class CKEditorEntityLinkConfigForm extends ConfigFormBase {
+
+    /**
+   * Entity type manager service.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
+   * The bundle information service.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   */
+    protected $bundleInfo;
+
+
+  /**
+   * Class constructor.
+   *
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The factory for configuration objects.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   Entity type manager service.
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   *   The entity type bundle info.
+   */
+  public function __construct(ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $bundle_info) {
+    parent::__construct($config_factory);
+    $this->entityTypeManager = $entity_type_manager;
+    $this->bundleInfo = $bundle_info;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('config.factory'),
+      $container->get('entity_type.manager'),
+      $container->get('entity_type.bundle.info')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -36,8 +82,7 @@ class CKEditorEntityLinkConfigForm extends ConfigFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->config('ckeditor_entity_link.settings');
-
-    $entity_types = \Drupal::entityTypeManager()->getDefinitions();
+    $entity_types = $this->entityTypeManager->getDefinitions();
     $options = [];
     foreach ($entity_types as $entity_type) {
       if ($entity_type->getGroup() == 'content') {
@@ -68,7 +113,7 @@ class CKEditorEntityLinkConfigForm extends ConfigFormBase {
     $selected_types = empty($form_state->getValue('entity_types')) ? $config->get('entity_types') : $form_state->getValue('entity_types');
     foreach ($selected_types as $type) {
       if (!empty($type)) {
-        $bundle_info = \Drupal::entityManager()->getBundleInfo($type);
+        $bundle_info = $this->bundleInfo->getBundleInfo($type);
         $bundles = array();
         foreach ($bundle_info as $bundle => $info) {
           $bundles[$bundle] = $info['label'];
