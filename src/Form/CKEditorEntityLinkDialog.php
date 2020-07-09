@@ -4,6 +4,7 @@ namespace Drupal\ckeditor_entity_link\Form;
 
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Form\BaseFormIdInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -33,8 +34,23 @@ class CKEditorEntityLinkDialog extends FormBase implements BaseFormIdInterface {
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   Entity type manager service.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager) {
+
+  /**
+   * The entity repository.
+   *
+   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   */
+  protected $entityRepository;
+
+  /**
+   * CKEditorEntityLinkDialog constructor.
+   *
+   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   *   Entity repository.
+   */
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityRepositoryInterface $entity_repository) {
     $this->entityTypeManager = $entity_type_manager;
+    $this->entityRepository = $entity_repository;
   }
 
   /**
@@ -42,7 +58,8 @@ class CKEditorEntityLinkDialog extends FormBase implements BaseFormIdInterface {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
+      $container->get('entity.repository')
     );
   }
 
@@ -135,6 +152,11 @@ class CKEditorEntityLinkDialog extends FormBase implements BaseFormIdInterface {
 
   /**
    * {@inheritdoc}
+   *
+   * @return \Drupal\Core\Ajax\AjaxResponse
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws \Drupal\Core\Entity\EntityMalformedException
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $response = new AjaxResponse();
@@ -152,10 +174,12 @@ class CKEditorEntityLinkDialog extends FormBase implements BaseFormIdInterface {
         ->getStorage($form_state->getValue('entity_type'))
         ->load($form_state->getValue('entity_id'));
 
+      // Get the entity translation from context.
+      $entity = $this->entityRepository->getTranslationFromContext($entity);
       $values = [
         'attributes' => [
-          'href' => $this->getUrl($entity),
-        ] + $form_state->getValue('attributes', []),
+            'href' => $this->getUrl($entity),
+          ] + $form_state->getValue('attributes', []),
       ];
 
       $response->addCommand(new EditorDialogSave($values));
@@ -173,6 +197,8 @@ class CKEditorEntityLinkDialog extends FormBase implements BaseFormIdInterface {
    *
    * @return string
    *   Entity url.
+
+   * @throws \Drupal\Core\Entity\EntityMalformedException
    */
   public function getUrl(EntityInterface $entity) {
     switch ($entity->getEntityType()->get('id')) {
@@ -181,6 +207,11 @@ class CKEditorEntityLinkDialog extends FormBase implements BaseFormIdInterface {
 
       case 'shortcut':
         return $entity->getUrl()->toString();
+
+      case 'file':
+        // Method toUrl is not implemented for File Entity, use File::url() instead.
+        // Do not confuse with deprecated EntityInterface::url().
+        return $entity->url();
 
       default:
         return $entity->toUrl()->toString();
