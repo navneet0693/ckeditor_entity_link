@@ -183,7 +183,7 @@ class CKEditorEntityLinkDialog extends FormBase implements BaseFormIdInterface {
         return $entity->getUrl()->toString();
 
       default:
-        return $entity->url();
+        return $entity->toUrl()->toString();
     }
   }
 
