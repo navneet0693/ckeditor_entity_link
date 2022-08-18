@@ -209,9 +209,7 @@ class CKEditorEntityLinkDialog extends FormBase implements BaseFormIdInterface {
         return $entity->getUrl()->toString();
 
       case 'file':
-        // Method toUrl is not implemented for File Entity, use File::url() instead.
-        // Do not confuse with deprecated EntityInterface::url().
-        return $entity->url();
+        return $entity->createFileUrl();
 
       case 'media':
         $media_source = $entity->getSource();
