@@ -2,18 +2,19 @@
 
 namespace Drupal\ckeditor_entity_link\Form;
 
+use Drupal\Core\Ajax\AjaxResponse;
+use Drupal\Core\Ajax\CloseModalDialogCommand;
+use Drupal\Core\Ajax\HtmlCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Form\BaseFormIdInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\filter\Entity\FilterFormat;
-use Drupal\Core\Ajax\AjaxResponse;
-use Drupal\Core\Ajax\HtmlCommand;
 use Drupal\editor\Ajax\EditorDialogSave;
-use Drupal\Core\Ajax\CloseModalDialogCommand;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\filter\Entity\FilterFormat;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -22,35 +23,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class CKEditorEntityLinkDialog extends FormBase implements BaseFormIdInterface {
 
   /**
-   * Entity type manager service.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * Class constructor.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   Entity type manager service.
-   */
-
-  /**
-   * The entity repository.
-   *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
-   */
-  protected $entityRepository;
-
-  /**
    * CKEditorEntityLinkDialog constructor.
-   *
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
-   *   Entity repository.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityRepositoryInterface $entity_repository) {
-    $this->entityTypeManager = $entity_type_manager;
-    $this->entityRepository = $entity_repository;
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected EntityRepositoryInterface $entityRepository,
+    protected FileUrlGeneratorInterface $fileUrlGenerator) {
   }
 
   /**
@@ -59,21 +37,22 @@ class CKEditorEntityLinkDialog extends FormBase implements BaseFormIdInterface {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('entity_type.manager'),
-      $container->get('entity.repository')
+      $container->get('entity.repository'),
+      $container->get('file_url_generator')
     );
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'ckeditor_entity_link_dialog';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getBaseFormId() {
+  public function getBaseFormId(): ?string {
     // Use the EditorLinkDialog form id to ease alteration.
     return 'editor_link_dialog';
   }
@@ -81,7 +60,7 @@ class CKEditorEntityLinkDialog extends FormBase implements BaseFormIdInterface {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, FilterFormat $filter_format = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, FilterFormat $filter_format = NULL): array {
     $config = $this->config('ckeditor_entity_link.settings');
 
     // The default values are set directly from \Drupal::request()->request,
@@ -152,13 +131,8 @@ class CKEditorEntityLinkDialog extends FormBase implements BaseFormIdInterface {
 
   /**
    * {@inheritdoc}
-   *
-   * @return \Drupal\Core\Ajax\AjaxResponse
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
-   * @throws \Drupal\Core\Entity\EntityMalformedException
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): AjaxResponse {
     $response = new AjaxResponse();
 
     if ($form_state->getErrors()) {
@@ -178,8 +152,8 @@ class CKEditorEntityLinkDialog extends FormBase implements BaseFormIdInterface {
       $entity = $this->entityRepository->getTranslationFromContext($entity);
       $values = [
         'attributes' => [
-            'href' => $this->getUrl($entity),
-          ] + $form_state->getValue('attributes', []),
+          'href' => $this->getUrl($entity),
+        ] + $form_state->getValue('attributes', []),
       ];
 
       $response->addCommand(new EditorDialogSave($values));
@@ -192,15 +166,11 @@ class CKEditorEntityLinkDialog extends FormBase implements BaseFormIdInterface {
   /**
    * Helper function to return entity url.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   *   Entity.
-   *
-   * @return string
-   *   Entity url.
-
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    * @throws \Drupal\Core\Entity\EntityMalformedException
    */
-  public function getUrl(EntityInterface $entity) {
+  public function getUrl(EntityInterface $entity): string {
     switch ($entity->getEntityType()->get('id')) {
       case 'menu_link_content':
         return $entity->getUrlObject()->toString();
@@ -220,11 +190,12 @@ class CKEditorEntityLinkDialog extends FormBase implements BaseFormIdInterface {
             return $url;
           }
         }
+
         // Handle file attachments.
         $fid = $media_source->getSourceFieldValue($entity);
         $file = $this->entityTypeManager->getStorage('file')->load($fid);
         if ($file) {
-          $url = file_create_url($file->getFileUri());
+          $url = $this->fileUrlGenerator->generateAbsoluteString($file->getFileUri());
           return parse_url($url, PHP_URL_PATH);
         }
         // In all other cases.
@@ -237,16 +208,8 @@ class CKEditorEntityLinkDialog extends FormBase implements BaseFormIdInterface {
 
   /**
    * Ajax callback to update the form fields which depend on embed type.
-   *
-   * @param array $form
-   *   The build form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The form state.
-   *
-   * @return \Drupal\Core\Ajax\AjaxResponse
-   *   Ajax response with updated options for the embed type.
    */
-  public function updateTypeSettings(array &$form, FormStateInterface $form_state) {
+  public function updateTypeSettings(array &$form, FormStateInterface $form_state): AjaxResponse {
     $response = new AjaxResponse();
 
     // Update options for entity type bundles.

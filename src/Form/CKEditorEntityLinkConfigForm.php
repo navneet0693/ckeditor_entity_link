@@ -12,40 +12,20 @@ use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class CKEditorEntityLinkConfigForm.
+ * Configuration form.
  *
  * @package Drupal\ckeditor_entity_link\Form
  */
 class CKEditorEntityLinkConfigForm extends ConfigFormBase {
 
   /**
-   * Entity type manager service.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * {@inheritdoc}
    */
-  protected $entityTypeManager;
-
-  /**
-   * The bundle information service.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
-   */
-  protected $bundleInfo;
-
-  /**
-   * Class constructor.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The factory for configuration objects.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   Entity type manager service.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundle_info
-   *   The entity bundle information service.
-   */
-  public function __construct(ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $bundle_info) {
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected EntityTypeBundleInfoInterface $bundleInfo) {
     parent::__construct($config_factory);
-    $this->entityTypeManager = $entity_type_manager;
-    $this->bundleInfo = $bundle_info;
   }
 
   /**
@@ -152,16 +132,8 @@ class CKEditorEntityLinkConfigForm extends ConfigFormBase {
 
   /**
    * Ajax callback to update the form fields which depend on embed type.
-   *
-   * @param array $form
-   *   The build form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The form state.
-   *
-   * @return \Drupal\Core\Ajax\AjaxResponse
-   *   Ajax response with updated options for the embed type.
    */
-  public function updateTypeSettings(array &$form, FormStateInterface $form_state) {
+  public function updateTypeSettings(array &$form, FormStateInterface $form_state): AjaxResponse {
     $response = new AjaxResponse();
 
     // Update options for entity type bundles.

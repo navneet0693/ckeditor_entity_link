@@ -1,0 +1,10 @@
+{
+  "name": "drupal/ckeditor_entity_link",
+  "type": "drupal-module",
+  "description": "This module allows to insert links to Drupal entities (content, files, tags, etc...) when using CKEditor.",
+  "homepage": "http://drupal.org/project/ckeditor_entity_link",
+  "license": "GPL-2.0-or-later",
+  "require": {
+    "drupal/core": "^10.0"
+  }
+}
