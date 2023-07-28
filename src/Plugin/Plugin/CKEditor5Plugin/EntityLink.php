@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\ckeditor_entity_link\Plugin\CKEditorPlugin;
+namespace Drupal\ckeditor_entity_link\Plugin\CKEditor5Plugin;
 
 use Drupal\ckeditor5\Plugin\CKEditor5PluginDefault;
 use Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition;
