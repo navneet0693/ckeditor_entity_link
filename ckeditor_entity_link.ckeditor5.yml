@@ -1,0 +1,8 @@
+ckeditor_entity_link_entitylink:
+  ckeditor5:
+    plugins: [entitylink.EntityLink]
+  drupal:
+    label: EntityLink
+    library: ckeditor_entity_link/ckeditor5.entitylink
+    elements:
+      - <a>
