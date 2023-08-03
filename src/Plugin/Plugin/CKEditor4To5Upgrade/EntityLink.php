@@ -12,9 +12,9 @@ use Drupal\filter\FilterFormatInterface;
  *
  * @CKEditor4To5Upgrade(
  *   id = "entitylink",
- *   cke4_plugin_settings = {
- *    "entitylink"
- *  }
+ *   cke4_buttons = {
+ *     "EntityLink"
+ *   }
  * )
  */
 class EntityLink extends PluginBase implements CKEditor4To5UpgradePluginInterface {
@@ -23,7 +23,14 @@ class EntityLink extends PluginBase implements CKEditor4To5UpgradePluginInterfac
    * {@inheritdoc}
    */
   public function mapCkeditor4ToolbarButtonToCkeditor5ToolbarItem(string $cke4_button, HTMLRestrictions $text_format_html_restrictions): ?array {
-    throw new \OutOfBoundsException();
+    switch ($cke4_button) {
+      // @see \Drupal\ckeditor_entity_link\Plugin\CKEditorPlugin\EntityLink
+      case 'EntityLink':
+        return ['link'];
+
+      default:
+        throw new \OutOfBoundsException();
+    }
   }
 
   /**
