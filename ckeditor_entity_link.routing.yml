@@ -13,3 +13,13 @@ ckeditor_entity_link.config_form:
     _title: 'CKEditor Entity Link settings'
   requirements:
     _permission: 'administer ckeditor_entity_link'
+
+ckeditor_entity_link.autocomplete:
+  path: '/ckeditor_entity_link/autocomplete'
+  defaults:
+    _controller: '\Drupal\ckeditor_entity_link\Controller\AutocompleteController::autocomplete'
+  requirements:
+    # Access is handled by the matchers.
+    _access: 'TRUE'
+  options:
+    _theme: ajax_base_page
