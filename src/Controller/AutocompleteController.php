@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\ckeditor_entity_link\Controller;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -24,20 +26,9 @@ class AutocompleteController {
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   A JSON response containing the autocomplete suggestions.
    */
-  public function autocomplete(Request $request, $entity) {
+  public function autocomplete(Request $request, $entity) : array {
     $suggestionCollection = [];
-dump($request);
-//    $entity = $this->entityTypeManager
-//      ->getStorage($form_state->getValue('entity_type'))
-//      ->load($form_state->getValue('entity_id'));
-//
-//    // Get the entity translation from context.
-//    $entity = $this->entityRepository->getTranslationFromContext($entity);
-//    $values = [
-//      'attributes' => [
-//          'href' => $this->getUrl($entity),
-//        ] + $form_state->getValue('attributes', []),
-//    ];
+
 
     return new JsonResponse($suggestionCollection);
   }
