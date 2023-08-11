@@ -24,10 +24,19 @@ function ckeditor_entity_link_help($route_name, RouteMatchInterface $route_match
 }
 
 /**
- * Implements hook_theme().
+ * Implements hook_page_attachments
+ * Attach ckeditor entity links configuration to drupalsettings
  */
-function ckeditor_entity_link_theme() {
-  $theme = [];
-
-  return $theme;
+function ckeditor_entity_link_page_attachments(array &$attachments) {
+  $config = \Drupal::config('ckeditor_entity_link.settings');
+  $entityTypes = $config->get('entity_types');
+  $enabledEntity = [];
+  if (is_array($entityTypes)) {
+    foreach ($entityTypes as $entity) {
+      if ($entity != 0) {
+        $enabledEntity[$entity] = $entity;
+      }
+    }
+  }
+  $attachments['#attached']['drupalSettings']['ckeditor_entity_link'] = $enabledEntity;
 }
